@@ -23,6 +23,23 @@ body{
   color:var(--text);
   overflow:hidden;
 }
+/* Smooth screen transitions */
+.screen{
+  opacity: 0;
+  transform: translateY(10px) scale(.995);
+  transition: opacity .55s ease, transform .55s ease;
+}
+
+.screen--active{
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* If user prefers reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .screen{transition:none; transform:none;}
+}
+
 
 .screen{
   position:absolute;
@@ -117,6 +134,15 @@ input:focus{
   color:var(--danger);
   font-weight:600;
 }
+.sara-pic{
+  width:170px;
+  height:170px;
+  object-fit:cover;
+  border-radius:22px;
+  border: 1px solid rgba(255,255,255,.35);
+  box-shadow: 0 18px 45px rgba(0,0,0,.35);
+}
+
 
 .hint{
   display:flex;
@@ -146,14 +172,72 @@ input:focus{
 }
 .glass{
   position:relative;
-  width:min(820px, 92vw);
-  padding:34px 28px;
-  border-radius: calc(var(--radius) + 6px);
+  width:min(980px, 94vw);
+  padding:46px 34px;
+  border-radius: calc(var(--radius) + 10px);
+
   background: linear-gradient(180deg, var(--glass), var(--glass2));
-  border:1px solid rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.20);
   box-shadow:var(--shadow);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
+  text-align:center;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  overflow:hidden; /* needed for glow effect */
 }
+
+/* Animated glow border */
+.glass::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius: inherit;
+  padding:2px;
+
+  background: conic-gradient(
+    from 180deg,
+    rgba(255,79,163,.55),
+    rgba(0,229,255,.45),
+    rgba(124,92,255,.50),
+    rgba(255,79,163,.55)
+  );
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: blur(.4px);
+  opacity:.65;
+
+  animation: glowSpin 7s linear infinite;
+  pointer-events:none;
+}
+
+/* Soft outer glow */
+.glass::after{
+  content:"";
+  position:absolute;
+  inset:-18px;
+  border-radius: inherit;
+  background:
+    radial-gradient(closest-side, rgba(255,79,163,.18), transparent 65%),
+    radial-gradient(closest-side, rgba(0,229,255,.14), transparent 70%);
+  filter: blur(10px);
+  opacity:.75;
+  pointer-events:none;
+}
+
+@keyframes glowSpin{
+  to { transform: rotate(360deg); }
+}
+
 
 .hello{
   margin:0 0 8px;
@@ -173,26 +257,44 @@ input:focus{
   text-shadow: 0 8px 25px rgba(0,229,255,.16);
 }
 .secret{
-  margin:0 0 22px;
+  margin:6px 0 10px;
   font-size:13px;
-  color:#000; /* as you asked */
-  opacity:.75;
+  color:#0b0b0f; /* black-ish text */
+  background: rgba(255,255,255,.92);
+  padding:10px 14px;
+  border-radius:999px; /* super round */
+  display:inline-block;
+  box-shadow: 0 10px 25px rgba(0,0,0,.18);
 }
 
 .btn-row{
   display:flex;
-  gap:14px;
+  gap:16px;
   flex-wrap:wrap;
+  justify-content:center;
+  width:100%;
+  margin-top:10px;
 }
+
+.btn--yes, .btn--no{
+  min-width:180px;
+  padding:16px 22px;
+  font-size:20px;
+  border-radius:18px;
+}
+
 .btn--yes{
-  background: linear-gradient(135deg, #22c55e, #a3ffcf);
-  color:#062410;
+  background: linear-gradient(135deg, #ff4fa3, #ff9ad1);
+  color:#2b0016;
+  box-shadow: 0 14px 30px rgba(255,79,163,.25);
 }
+
 .btn--no{
   background: rgba(0,0,0,.35);
   border:1px solid rgba(255,255,255,.22);
   color:rgba(255,255,255,.9);
 }
+
 
 /* Yes screen */
 #screenYes{
