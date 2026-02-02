@@ -20,24 +20,37 @@ const bgMusic = document.getElementById("bgMusic");
 const confettiCanvas = document.getElementById("confetti");
 const ctx = confettiCanvas ? confettiCanvas.getContext("2d") : null;
 
+// ====== CROSS-FADE STATE ======
+let currentScreen = screenLock; // starts here because index.html has screenLock active
+let z = 10;
+
 // ====== HELPERS ======
 function setTitle(t) {
   document.title = t;
 }
 
-function showScreen(which) {
-  if (!screenLock || !screenVal || !screenYes || !which) return;
+/**
+ * Cross-fade transition:
+ * - Turn ON next screen first (fade in)
+ * - Then turn OFF current screen next frame (fade out)
+ * This avoids the "pop" effect.
+ */
+function showScreen(next) {
+  if (!screenLock || !screenVal || !screenYes || !next) return;
 
-  // Remove active
-  screenLock.classList.remove("screen--active");
-  screenVal.classList.remove("screen--active");
-  screenYes.classList.remove("screen--active");
+  // Put next screen above the current one
+  z += 1;
+  next.style.zIndex = z;
 
-  // Force the browser to apply the removal, then apply the add
+  // Fade next in
+  next.classList.add("screen--active");
+
+  // Fade current out after the browser paints next
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      which.classList.add("screen--active");
-    });
+    if (currentScreen && currentScreen !== next) {
+      currentScreen.classList.remove("screen--active");
+    }
+    currentScreen = next;
   });
 }
 
@@ -51,14 +64,14 @@ function tryUnlock() {
     errorText.textContent = "";
     setTitle("For Sara ❤️");
 
-    // 🔊 Start music safely (won't crash if missing)
+    // 🔊 Start music safely
     if (bgMusic) {
       bgMusic.volume = 0.55;
       bgMusic.muted = false;
       bgMusic.play().catch((e) => console.log("Music blocked:", e));
     }
 
-    // smooth transition
+    // Smooth transition
     unlockBtn.disabled = true;
     setTimeout(() => {
       showScreen(screenVal);
@@ -125,7 +138,6 @@ function resizeCanvas() {
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
 }
-
 window.addEventListener("resize", resizeCanvas);
 
 function makeConfetti(n = 220) {
