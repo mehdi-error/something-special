@@ -38,7 +38,7 @@ body{
   pointer-events:none;
 
   transform: translateY(14px) scale(.992);
-  transition: opacity 1.2s ease, transform .7s ease, visibility 0s linear .7s;
+  transition: opacity 1.8s ease, transform .7s ease, visibility 0s linear .7s;
 }
 
 .screen--active{
@@ -47,7 +47,7 @@ body{
   pointer-events:auto;
 
   transform: translateY(0) scale(1);
-  transition: opacity 1.2s ease, transform .7s ease, visibility 0s;
+  transition: opacity 1.8s ease, transform .7s ease, visibility 0s;
 }
 
 /* If user prefers reduced motion */
