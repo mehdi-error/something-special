@@ -1,16 +1,70 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>💌</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Restricted Access</title>
+
+  <!-- Sleek font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Hey ❤️</h1>
-  <p>I made this just for you.</p>
 
-  <button onclick="sayYes()">Yes</button>
-  <button id="noBtn">No</button>
+  <!-- PASSCODE SCREEN -->
+  <main class="screen screen--active" id="screenLock">
+    <div class="lock-card">
+      <div class="lock-badge">SECURE ACCESS</div>
+      <h1>This Website has been made for 1 person only</h1>
+      <p class="subtitle">Enter the passcode to continue</p>
+
+      <div class="input-row">
+        <input id="passcode" type="password" inputmode="numeric" autocomplete="one-time-code"
+               placeholder="••••••••••" aria-label="Passcode" />
+        <button id="unlockBtn" class="btn btn--primary" type="button">Unlock</button>
+      </div>
+
+      <p id="errorText" class="error" aria-live="polite"></p>
+
+      <div class="hint">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="hint-text">Authorized user only</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- VALENTINE SCREEN -->
+  <main class="screen" id="screenVal">
+    <div class="bg" aria-hidden="true"></div>
+
+    <div class="glass">
+      <h2 class="hello">hey habibti <span class="name">sara</span></h2>
+      <p class="question">Will you be my Valentine?</p>
+      <p class="secret">and melt me with your love like you always do bebeno</p>
+
+      <div class="btn-row" id="btnRow">
+        <button id="yesBtn" class="btn btn--yes" type="button">Yes</button>
+        <button id="noBtn" class="btn btn--no" type="button">No</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- YES / CELEBRATION SCREEN -->
+  <main class="screen" id="screenYes">
+    <canvas id="confetti"></canvas>
+
+    <div class="yes-card">
+      <div class="heartline">💖💖💖</div>
+      <h2>I love you hayati</h2>
+      <p>can't wait to see you and give you bousatt</p>
+      <button id="replayBtn" class="btn btn--primary" type="button">Replay 🎉</button>
+    </div>
+  </main>
 
   <script src="script.js"></script>
 </body>
 </html>
+
