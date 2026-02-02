@@ -83,7 +83,7 @@ function tryUnlock() {
     setTimeout(() => {
       showScreen(screenVal);
       unlockBtn.disabled = false;
-    }, 150);
+    }, 350);
 
   } else {
     errorText.textContent = "Access Restricted. Incorrect Passcode";
