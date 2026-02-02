@@ -28,7 +28,7 @@ function showScreen(which) {
     which.classList.add("screen--active");
   });
 }
-
+const bgMusic = document.getElementById("bgMusic");
 
 function setTitle(t) {
   document.title = t;
@@ -41,6 +41,10 @@ function tryUnlock() {
   if (val === CORRECT_PASSCODE) {
     errorText.textContent = "";
 setTitle("For Sara ❤️");
+    // Start music on user gesture (works on mobile)
+bgMusic.volume = 0.55;
+bgMusic.play().catch(() => {});
+
 
 // tiny cinematic delay
     unlockBtn.disabled = true;
