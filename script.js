@@ -13,56 +13,57 @@ const errorText  = document.getElementById("errorText");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn  = document.getElementById("noBtn");
 const btnRow = document.getElementById("btnRow");
-const replayBtn = document.getElementById("replayBtn");
 
-const confettiCanvas = document.getElementById("confetti");
-const ctx = confettiCanvas.getContext("2d");
-
-// ====== HELPERS ======
-function showScreen(which) {
-  for (const el of [screenLock, screenVal, screenYes]) {
-    el.classList.remove("screen--active");
-  }
-  // next frame so CSS transition reliably triggers
-  requestAnimationFrame(() => {
-    which.classList.add("screen--active");
-  });
-}
 const bgMusic = document.getElementById("bgMusic");
 
+// Confetti canvas (safe)
+const confettiCanvas = document.getElementById("confetti");
+const ctx = confettiCanvas ? confettiCanvas.getContext("2d") : null;
+
+// ====== HELPERS ======
 function setTitle(t) {
   document.title = t;
 }
 
-// ====== PASSCODE LOGIC ======
-function tryUnlock() {
-  const val = (passInput.value || "").trim();
+function showScreen(which) {
+  // guard
+  if (!screenLock || !screenVal || !screenYes || !which) return;
 
- if (val === CORRECT_PASSCODE) {
-  errorText.textContent = "";
-  setTitle("For Sara ❤️");
+  for (const el of [screenLock, screenVal, screenYes]) {
+    el.classList.remove("screen--active");
+  }
 
-  // 🔊 START BACKGROUND MUSIC (user interaction = allowed)
-  bgMusic.volume = 0.55;
-  bgMusic.muted = false;
-  bgMusic.play().catch((e) => console.log("Music blocked:", e));
-
-  // smooth transition
-  setTimeout(() => {
-    showScreen(screenVal);
-  }, 120);
+  // Next frame so CSS transition reliably triggers
+  requestAnimationFrame(() => {
+    which.classList.add("screen--active");
+  });
 }
 
+// ====== PASSCODE LOGIC ======
+function tryUnlock() {
+  if (!passInput || !unlockBtn || !errorText) return;
 
+  const val = (passInput.value || "").trim();
 
-// tiny cinematic delay
+  if (val === CORRECT_PASSCODE) {
+    errorText.textContent = "";
+    setTitle("For Sara ❤️");
+
+    // 🔊 Start music safely (won't crash if missing)
+    if (bgMusic) {
+      bgMusic.volume = 0.55;
+      bgMusic.muted = false;
+      bgMusic.play().catch((e) => console.log("Music blocked:", e));
+    }
+
+    // smooth transition
     unlockBtn.disabled = true;
-setTimeout(() => {
-  showScreen(screenVal);
-  unlockBtn.disabled = false;
-}, 180);
+    setTimeout(() => {
+      showScreen(screenVal);
+      unlockBtn.disabled = false;
+    }, 180);
+
   } else {
-    // Red text near input like you asked
     errorText.textContent = "Access Restricted. Incorrect Passcode";
     setTitle("Access Restricted");
     passInput.focus();
@@ -70,61 +71,67 @@ setTimeout(() => {
   }
 }
 
-unlockBtn.addEventListener("click", tryUnlock);
-passInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") tryUnlock();
-});
+// Bind events (safe)
+if (unlockBtn) unlockBtn.addEventListener("click", tryUnlock);
+if (passInput) {
+  passInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryUnlock();
+  });
+}
 
-// ====== NO BUTTON: switch places around the page (swap order) ======
+// ====== NO BUTTON: swap positions ======
 let swapped = false;
-noBtn.addEventListener("click", () => {
-  // Swap the two buttons in the row
-  swapped = !swapped;
-  if (swapped) {
-    btnRow.insertBefore(noBtn, yesBtn);
-  } else {
-    btnRow.insertBefore(yesBtn, noBtn);
-  }
 
-  // Also add a quick "teleport" feel
-  noBtn.style.transform = "translateY(-2px) scale(1.02)";
-  setTimeout(() => (noBtn.style.transform = ""), 140);
-});
+if (noBtn && yesBtn && btnRow) {
+  noBtn.addEventListener("click", () => {
+    swapped = !swapped;
 
-// (Optional extra fun: makes it harder to click)
-noBtn.addEventListener("mouseenter", () => {
-  noBtn.style.transform = "translateX(8px)";
-  setTimeout(() => (noBtn.style.transform = ""), 120);
-});
+    if (swapped) {
+      btnRow.insertBefore(noBtn, yesBtn);
+    } else {
+      btnRow.insertBefore(yesBtn, noBtn);
+    }
+
+    // quick "teleport" feel
+    noBtn.style.transform = "translateY(-2px) scale(1.02)";
+    setTimeout(() => (noBtn.style.transform = ""), 140);
+  });
+
+  // Optional extra: tiny dodge
+  noBtn.addEventListener("mouseenter", () => {
+    noBtn.style.transform = "translateX(8px)";
+    setTimeout(() => (noBtn.style.transform = ""), 120);
+  });
+}
 
 // ====== YES BUTTON: celebration + confetti ======
-yesBtn.addEventListener("click", () => {
-  setTitle("SHE SAID YES 💖");
-  showScreen(screenYes);
-  startConfetti();
-});
+if (yesBtn) {
+  yesBtn.addEventListener("click", () => {
+    setTitle("SHE SAID YES 💖");
+    showScreen(screenYes);
+    startConfetti();
+  });
+}
 
-replayBtn.addEventListener("click", () => {
-  stopConfetti();
-  // back to valentine screen
-  setTitle("For Sara ❤️");
-  showScreen(screenVal);
-});
-
-// ====== CONFETTI (no libraries) ======
+// ====== CONFETTI ======
 let confettiPieces = [];
 let animId = null;
 let running = false;
 
 function resizeCanvas() {
+  if (!confettiCanvas || !ctx) return;
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
 }
+
 window.addEventListener("resize", resizeCanvas);
 
 function makeConfetti(n = 220) {
+  if (!confettiCanvas) return;
+
   const w = confettiCanvas.width;
   const h = confettiCanvas.height;
+
   confettiPieces = Array.from({ length: n }, () => {
     const size = 6 + Math.random() * 8;
     return {
@@ -135,7 +142,6 @@ function makeConfetti(n = 220) {
       rot: Math.random() * Math.PI,
       vr: -0.15 + Math.random() * 0.3,
       size,
-      // random bright color
       color: `hsl(${Math.floor(Math.random() * 360)}, 95%, 65%)`,
       shape: Math.random() < 0.18 ? "heart" : "rect"
     };
@@ -143,6 +149,8 @@ function makeConfetti(n = 220) {
 }
 
 function drawHeart(x, y, s, color, rot) {
+  if (!ctx) return;
+
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rot);
@@ -160,14 +168,14 @@ function drawHeart(x, y, s, color, rot) {
 }
 
 function frame() {
-  if (!running) return;
+  if (!running || !confettiCanvas || !ctx) return;
 
   const w = confettiCanvas.width;
   const h = confettiCanvas.height;
 
   ctx.clearRect(0, 0, w, h);
 
-  // subtle glow
+  // subtle glow layer
   ctx.fillStyle = "rgba(255,255,255,0.04)";
   ctx.fillRect(0, 0, w, h);
 
@@ -200,9 +208,12 @@ function frame() {
 }
 
 function startConfetti() {
+  if (!confettiCanvas || !ctx) return;
+
   resizeCanvas();
   makeConfetti();
   running = true;
+
   if (animId) cancelAnimationFrame(animId);
   frame();
 }
@@ -211,8 +222,10 @@ function stopConfetti() {
   running = false;
   if (animId) cancelAnimationFrame(animId);
   animId = null;
+
+  if (!confettiCanvas || !ctx) return;
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 }
 
-// Optional: make unlock smoother on mobile
-passInput.focus();
+// Focus input if available
+if (passInput) passInput.focus();
