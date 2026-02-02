@@ -1,11 +1,236 @@
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 100px;
+:root{
+  --bg:#06070b;
+  --text:#e9eefc;
+  --muted:#a8b3d6;
+  --danger:#ff3b3b;
+  --accent:#7c5cff;
+  --accent2:#00e5ff;
+  --glass: rgba(255,255,255,.14);
+  --glass2: rgba(255,255,255,.10);
+  --shadow: 0 20px 60px rgba(0,0,0,.45);
+  --radius: 22px;
+  --font: "Space Grotesk", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-button {
-  font-size: 20px;
-  padding: 10px 20px;
-  margin: 10px;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  background: radial-gradient(1200px 800px at 70% 10%, rgba(124,92,255,.25), transparent 55%),
+              radial-gradient(900px 700px at 15% 80%, rgba(0,229,255,.18), transparent 60%),
+              var(--bg);
+  color:var(--text);
+  overflow:hidden;
+}
+
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  place-items:center;
+  padding:24px;
+}
+.screen--active{display:grid;}
+
+.lock-card{
+  width:min(720px, 92vw);
+  border-radius:var(--radius);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:var(--shadow);
+  padding:34px 28px;
+  backdrop-filter: blur(10px);
+}
+
+.lock-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  letter-spacing:.14em;
+  font-size:12px;
+  color:rgba(255,255,255,.85);
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.22);
+}
+.lock-badge::before{
+  content:"";
+  width:10px;height:10px;border-radius:50%;
+  background: radial-gradient(circle at 30% 30%, #00ff9d, #0a6);
+  box-shadow: 0 0 18px rgba(0,255,157,.35);
+}
+
+h1{
+  margin:18px 0 6px;
+  font-size:clamp(22px, 3.2vw, 34px);
+  line-height:1.15;
+}
+.subtitle{
+  margin:0 0 18px;
+  color:var(--muted);
+}
+
+.input-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+input{
+  flex:1;
+  border-radius:14px;
+  padding:14px 14px;
+  font-size:16px;
+  background: rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.16);
+  color:var(--text);
+  outline:none;
+}
+input:focus{
+  border-color: rgba(124,92,255,.65);
+  box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+}
+
+.btn{
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  font-weight:700;
+  cursor:pointer;
+  transition: transform .12s ease, filter .12s ease;
+  user-select:none;
+}
+.btn:active{transform: translateY(1px) scale(.99)}
+.btn:hover{filter: brightness(1.06)}
+
+.btn--primary{
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color:#061018;
+}
+
+.error{
+  margin:10px 0 0;
+  min-height:22px;
+  color:var(--danger);
+  font-weight:600;
+}
+
+.hint{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:18px;
+  opacity:.75;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background: rgba(255,255,255,.55);
+}
+.hint-text{margin-left:6px;color:rgba(255,255,255,.7);font-size:13px}
+
+/* Valentine screen */
+#screenVal{
+  grid-template-columns: 1fr;
+}
+.bg{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.65)),
+    url("assets/sara-bg.jpg") center/cover no-repeat;
+  filter: saturate(1.05) contrast(1.05);
+  transform: scale(1.03);
+}
+.glass{
+  position:relative;
+  width:min(820px, 92vw);
+  padding:34px 28px;
+  border-radius: calc(var(--radius) + 6px);
+  background: linear-gradient(180deg, var(--glass), var(--glass2));
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hello{
+  margin:0 0 8px;
+  font-size:clamp(22px, 3vw, 38px);
+}
+.name{
+  background: linear-gradient(135deg, #ffd1ff, #b9fff6);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.question{
+  margin:0 0 8px;
+  font-weight:800;
+  font-size:clamp(18px, 2.4vw, 28px);
+  color: #b9fff6;
+  text-shadow: 0 8px 25px rgba(0,229,255,.16);
+}
+.secret{
+  margin:0 0 22px;
+  font-size:13px;
+  color:#000; /* as you asked */
+  opacity:.75;
+}
+
+.btn-row{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.btn--yes{
+  background: linear-gradient(135deg, #22c55e, #a3ffcf);
+  color:#062410;
+}
+.btn--no{
+  background: rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.22);
+  color:rgba(255,255,255,.9);
+}
+
+/* Yes screen */
+#screenYes{
+  background:
+    radial-gradient(900px 600px at 70% 20%, rgba(255,105,180,.24), transparent 60%),
+    radial-gradient(900px 600px at 20% 80%, rgba(0,229,255,.18), transparent 60%),
+    #05060b;
+}
+
+#confetti{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.yes-card{
+  position:relative;
+  width:min(740px, 92vw);
+  padding:34px 28px;
+  border-radius:var(--radius);
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.20);
+  box-shadow:var(--shadow);
+  backdrop-filter: blur(12px);
+  text-align:center;
+}
+
+.yes-card h2{
+  margin:8px 0 6px;
+  font-size:clamp(24px, 3vw, 40px);
+}
+.yes-card p{
+  margin:0 0 16px;
+  color:rgba(255,255,255,.85);
+  font-size:clamp(14px, 1.7vw, 18px);
+}
+.heartline{
+  font-size:24px;
+  letter-spacing:6px;
 }
