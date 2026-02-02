@@ -24,16 +24,36 @@ body{
   overflow:hidden;
 }
 /* Smooth screen transitions */
+/* Screens: keep them in the DOM so transitions can animate */
 .screen{
-  opacity: 0;
-  transform: translateY(10px) scale(.995);
-  transition: opacity .55s ease, transform .55s ease;
+  position:absolute;
+  inset:0;
+
+  display:grid;
+  place-items:center;
+  padding:24px;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transform: translateY(14px) scale(.992);
+  transition: opacity .7s ease, transform .7s ease, visibility 0s linear .7s;
 }
 
 .screen--active{
-  opacity: 1;
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
   transform: translateY(0) scale(1);
+  transition: opacity .7s ease, transform .7s ease, visibility 0s;
 }
+
+@media (prefers-reduced-motion: reduce){
+  .screen{transition:none; transform:none;}
+}
+
 
 /* If user prefers reduced motion */
 @media (prefers-reduced-motion: reduce){
