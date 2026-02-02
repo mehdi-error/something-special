@@ -60,26 +60,6 @@ body{
   .screen{transition:none; transform:none;}
 }
 
-
-.screen{
-  position:absolute;
-  inset:0;
-  display:none;
-  place-items:center;
-  padding:24px;
-}
-.screen--active{display:grid;}
-
-.lock-card{
-  width:min(720px, 92vw);
-  border-radius:var(--radius);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:var(--shadow);
-  padding:34px 28px;
-  backdrop-filter: blur(10px);
-}
-
 .lock-badge{
   display:inline-flex;
   align-items:center;
