@@ -36,8 +36,14 @@ function tryUnlock() {
 
   if (val === CORRECT_PASSCODE) {
     errorText.textContent = "";
-    setTitle("For Sara ❤️");
-    showScreen(screenVal);
+setTitle("For Sara ❤️");
+
+// tiny cinematic delay
+    unlockBtn.disabled = true;
+setTimeout(() => {
+  showScreen(screenVal);
+  unlockBtn.disabled = false;
+}, 180);
   } else {
     // Red text near input like you asked
     errorText.textContent = "Access Restricted. Incorrect Passcode";
