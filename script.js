@@ -23,8 +23,12 @@ function showScreen(which) {
   for (const el of [screenLock, screenVal, screenYes]) {
     el.classList.remove("screen--active");
   }
-  which.classList.add("screen--active");
+  // next frame so CSS transition reliably triggers
+  requestAnimationFrame(() => {
+    which.classList.add("screen--active");
+  });
 }
+
 
 function setTitle(t) {
   document.title = t;
