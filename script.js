@@ -16,12 +16,12 @@ const btnRow = document.getElementById("btnRow");
 
 const bgMusic = document.getElementById("bgMusic");
 
-// Confetti canvas (safe)
+// Confetti
 const confettiCanvas = document.getElementById("confetti");
 const ctx = confettiCanvas ? confettiCanvas.getContext("2d") : null;
 
-// ====== CROSS-FADE STATE ======
-let currentScreen = screenLock; // starts here because index.html has screenLock active
+// ====== SCREEN STATE (IMPORTANT FOR FADE) ======
+let currentScreen = screenLock;
 let z = 10;
 
 // ====== HELPERS ======
@@ -30,27 +30,33 @@ function setTitle(t) {
 }
 
 /**
- * Cross-fade transition:
- * - Turn ON next screen first (fade in)
- * - Then turn OFF current screen next frame (fade out)
- * This avoids the "pop" effect.
+ * BULLETPROOF CROSS-FADE
+ * Forces reflow + two animation frames so browser MUST animate
  */
 function showScreen(next) {
-  if (!screenLock || !screenVal || !screenYes || !next) return;
+  if (!next || !currentScreen) return;
 
-  // Put next screen above the current one
+  // Bring next screen above
   z += 1;
   next.style.zIndex = z;
 
-  // Fade next in
-  next.classList.add("screen--active");
+  // Ensure next starts hidden
+  next.classList.remove("screen--active");
 
-  // Fade current out after the browser paints next
+  // FORCE browser to apply hidden state
+  void next.offsetHeight;
+
+  // Frame 1: fade next in
   requestAnimationFrame(() => {
-    if (currentScreen && currentScreen !== next) {
-      currentScreen.classList.remove("screen--active");
-    }
-    currentScreen = next;
+    next.classList.add("screen--active");
+
+    // Frame 2: fade current out
+    requestAnimationFrame(() => {
+      if (currentScreen !== next) {
+        currentScreen.classList.remove("screen--active");
+        currentScreen = next;
+      }
+    });
   });
 }
 
@@ -58,25 +64,26 @@ function showScreen(next) {
 function tryUnlock() {
   if (!passInput || !unlockBtn || !errorText) return;
 
-  const val = (passInput.value || "").trim();
+  const val = passInput.value.trim();
 
   if (val === CORRECT_PASSCODE) {
     errorText.textContent = "";
     setTitle("For Sara ❤️");
 
-    // 🔊 Start music safely
+    // 🔊 Start music (safe)
     if (bgMusic) {
       bgMusic.volume = 0.55;
       bgMusic.muted = false;
-      bgMusic.play().catch((e) => console.log("Music blocked:", e));
+      bgMusic.play().catch(() => {});
     }
 
-    // Smooth transition
     unlockBtn.disabled = true;
+
+    // Delay makes fade feel intentional
     setTimeout(() => {
       showScreen(screenVal);
       unlockBtn.disabled = false;
-    }, 180);
+    }, 150);
 
   } else {
     errorText.textContent = "Access Restricted. Incorrect Passcode";
@@ -86,7 +93,7 @@ function tryUnlock() {
   }
 }
 
-// Bind events (safe)
+// ====== EVENTS ======
 if (unlockBtn) unlockBtn.addEventListener("click", tryUnlock);
 if (passInput) {
   passInput.addEventListener("keydown", (e) => {
@@ -94,32 +101,29 @@ if (passInput) {
   });
 }
 
-// ====== NO BUTTON: swap positions ======
+// ====== NO BUTTON BEHAVIOR ======
 let swapped = false;
 
 if (noBtn && yesBtn && btnRow) {
   noBtn.addEventListener("click", () => {
     swapped = !swapped;
-
     if (swapped) {
       btnRow.insertBefore(noBtn, yesBtn);
     } else {
       btnRow.insertBefore(yesBtn, noBtn);
     }
 
-    // quick "teleport" feel
-    noBtn.style.transform = "translateY(-2px) scale(1.02)";
-    setTimeout(() => (noBtn.style.transform = ""), 140);
+    noBtn.style.transform = "scale(1.05)";
+    setTimeout(() => (noBtn.style.transform = ""), 120);
   });
 
-  // Optional extra: tiny dodge
   noBtn.addEventListener("mouseenter", () => {
     noBtn.style.transform = "translateX(8px)";
     setTimeout(() => (noBtn.style.transform = ""), 120);
   });
 }
 
-// ====== YES BUTTON: celebration + confetti ======
+// ====== YES BUTTON ======
 if (yesBtn) {
   yesBtn.addEventListener("click", () => {
     setTitle("SHE SAID YES 💖");
@@ -143,31 +147,24 @@ window.addEventListener("resize", resizeCanvas);
 function makeConfetti(n = 220) {
   if (!confettiCanvas) return;
 
-  const w = confettiCanvas.width;
-  const h = confettiCanvas.height;
-
-  confettiPieces = Array.from({ length: n }, () => {
-    const size = 6 + Math.random() * 8;
-    return {
-      x: Math.random() * w,
-      y: -Math.random() * h,
-      vx: -1 + Math.random() * 2,
-      vy: 2 + Math.random() * 5,
-      rot: Math.random() * Math.PI,
-      vr: -0.15 + Math.random() * 0.3,
-      size,
-      color: `hsl(${Math.floor(Math.random() * 360)}, 95%, 65%)`,
-      shape: Math.random() < 0.18 ? "heart" : "rect"
-    };
-  });
+  confettiPieces = Array.from({ length: n }, () => ({
+    x: Math.random() * confettiCanvas.width,
+    y: -Math.random() * confettiCanvas.height,
+    vx: -1 + Math.random() * 2,
+    vy: 2 + Math.random() * 5,
+    rot: Math.random() * Math.PI,
+    vr: -0.15 + Math.random() * 0.3,
+    size: 6 + Math.random() * 8,
+    color: `hsl(${Math.random() * 360},95%,65%)`,
+    shape: Math.random() < 0.2 ? "heart" : "rect"
+  }));
 }
 
-function drawHeart(x, y, s, color, rot) {
+function drawHeart(x, y, s, c, r) {
   if (!ctx) return;
-
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(rot);
+  ctx.rotate(r);
   ctx.scale(s / 20, s / 20);
   ctx.beginPath();
   ctx.moveTo(0, 6);
@@ -176,35 +173,22 @@ function drawHeart(x, y, s, color, rot) {
   ctx.bezierCurveTo(0, 18, 12, 14, 12, 4);
   ctx.bezierCurveTo(12, -6, 0, -6, 0, 6);
   ctx.closePath();
-  ctx.fillStyle = color;
+  ctx.fillStyle = c;
   ctx.fill();
   ctx.restore();
 }
 
 function frame() {
-  if (!running || !confettiCanvas || !ctx) return;
+  if (!running || !ctx) return;
 
-  const w = confettiCanvas.width;
-  const h = confettiCanvas.height;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // subtle glow layer
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
-  ctx.fillRect(0, 0, w, h);
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 
   for (const p of confettiPieces) {
     p.x += p.vx;
     p.y += p.vy;
     p.rot += p.vr;
 
-    // wrap
-    if (p.y > h + 40) {
-      p.y = -20;
-      p.x = Math.random() * w;
-    }
-    if (p.x < -40) p.x = w + 40;
-    if (p.x > w + 40) p.x = -40;
+    if (p.y > confettiCanvas.height + 40) p.y = -20;
 
     if (p.shape === "heart") {
       drawHeart(p.x, p.y, p.size * 1.8, p.color, p.rot);
@@ -222,24 +206,13 @@ function frame() {
 }
 
 function startConfetti() {
-  if (!confettiCanvas || !ctx) return;
-
+  if (!ctx) return;
   resizeCanvas();
   makeConfetti();
   running = true;
-
-  if (animId) cancelAnimationFrame(animId);
+  cancelAnimationFrame(animId);
   frame();
 }
 
-function stopConfetti() {
-  running = false;
-  if (animId) cancelAnimationFrame(animId);
-  animId = null;
-
-  if (!confettiCanvas || !ctx) return;
-  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-}
-
-// Focus input if available
+// Autofocus
 if (passInput) passInput.focus();
