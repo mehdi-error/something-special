@@ -38,12 +38,21 @@ function setTitle(t) {
 function tryUnlock() {
   const val = (passInput.value || "").trim();
 
-  if (val === CORRECT_PASSCODE) {
-    errorText.textContent = "";
-setTitle("For Sara ❤️");
-    // Start music on user gesture (works on mobile)
-bgMusic.volume = 0.55;
-bgMusic.play().catch(() => {});
+ if (val === CORRECT_PASSCODE) {
+  errorText.textContent = "";
+  setTitle("For Sara ❤️");
+
+  // 🔊 START BACKGROUND MUSIC (user interaction = allowed)
+  bgMusic.volume = 0.55;
+  bgMusic.muted = false;
+  bgMusic.play().catch((e) => console.log("Music blocked:", e));
+
+  // smooth transition
+  setTimeout(() => {
+    showScreen(screenVal);
+  }, 120);
+}
+
 
 
 // tiny cinematic delay
