@@ -26,16 +26,18 @@ function setTitle(t) {
 }
 
 function showScreen(which) {
-  // guard
   if (!screenLock || !screenVal || !screenYes || !which) return;
 
-  for (const el of [screenLock, screenVal, screenYes]) {
-    el.classList.remove("screen--active");
-  }
+  // Remove active
+  screenLock.classList.remove("screen--active");
+  screenVal.classList.remove("screen--active");
+  screenYes.classList.remove("screen--active");
 
-  // Next frame so CSS transition reliably triggers
+  // Force the browser to apply the removal, then apply the add
   requestAnimationFrame(() => {
-    which.classList.add("screen--active");
+    requestAnimationFrame(() => {
+      which.classList.add("screen--active");
+    });
   });
 }
 
